@@ -20,35 +20,12 @@ interface ChatSession {
   messages: Message[];
   updatedAt: string;
 }
-
 function HomeContent() {
-  const searchParams = useSearchParams()
-  const sessionId = searchParams.get("id")
-
-  const [currentId, setCurrentId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Load session from API if ID in URL
-  useEffect(() => {
-    if (sessionId) {
-      fetch(`/api/history`)
-        .then(res => res.json())
-        .then((data: ChatSession[]) => {
-          const session = data.find(s => s.id === sessionId)
-          if (session) {
-            setMessages(session.messages)
-            setCurrentId(session.id)
-          }
-        })
-        .catch(err => console.error("Failed to load session:", err))
-    } else {
-      setMessages([])
-      setCurrentId(null)
-    }
-  }, [sessionId])
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -56,35 +33,6 @@ function HomeContent() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
   }, [messages])
-
-  // Save/Update session whenever messages change
-  const saveSession = useCallback(async (msgs: Message[]) => {
-    if (msgs.length === 0) return;
-
-    const id = currentId || Date.now().toString();
-    if (!currentId) setCurrentId(id);
-
-    try {
-      await fetch("/api/history", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id,
-          messages: msgs,
-          title: msgs[0].content.slice(0, 40) + (msgs[0].content.length > 40 ? "..." : "")
-        })
-      });
-    } catch (err) {
-      console.error("Failed to save history:", err);
-    }
-  }, [currentId]);
-
-  useEffect(() => {
-    if (messages.length > 0) {
-      const timer = setTimeout(() => saveSession(messages), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [messages, saveSession]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return
@@ -117,7 +65,7 @@ function HomeContent() {
 
   return (
     <div className="flex flex-col h-full w-full relative bg-muted/5">
-      {/* Chat History Area */}
+      {/* Chat History Area - Re-named to Message Area for clarity */}
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 space-y-8 scroll-smooth"
@@ -136,6 +84,9 @@ function HomeContent() {
               Expert Marketing Co-pilot <br />
               ช่วยคุณคิดคอนเทนต์ วางแผนโพสต์ และสร้าง Hook โดนๆ ในพริบตา
             </p>
+            <div className="mt-4 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
+              <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Temporary Session • No History Saved</span>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-10 w-full max-w-lg">
               <Button variant="outline" className="h-auto py-4 px-4 flex flex-col items-start gap-1 rounded-2xl border-primary/10 hover:border-primary/30 hover:bg-primary/5 transition-all" onClick={() => setInput("ช่วยคิดแคปชั่นขายเซรั่มหน้าใส สำหรับกลุ่มวัยทำงานหน่อย")}>

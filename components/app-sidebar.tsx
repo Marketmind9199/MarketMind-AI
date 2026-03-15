@@ -70,7 +70,6 @@ export function AppSidebar() {
           <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center ring-1 ring-primary/20">
             <Sparkles className="w-5 h-5 text-primary" />
           </div>
-          <span className="font-bold text-sm tracking-tight">MarketMind History</span>
         </div>
         <Button
           variant="outline"
@@ -84,13 +83,11 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="px-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50 flex items-center gap-2">
-            <Clock className="w-3 h-3" />
-            Recent Campaigns
           </SidebarGroupLabel>
           <SidebarMenu className="px-2 mt-2 gap-1">
             {history.length === 0 ? (
               <div className="px-4 py-8 text-center opacity-40">
-                <p className="text-[10px] font-medium italic">No past sessions found</p>
+                <p className="text-[10px] font-medium italic"></p>
               </div>
             ) : (
               history.map((item) => (
